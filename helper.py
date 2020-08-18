@@ -19,7 +19,6 @@ def fvecs_read(filename, c_contiguous=True):
 
 
 def read_fvecs(path):
-
     
     fileSize = os.path.getsize(path)
     file =  open(path,'rb')
@@ -40,9 +39,9 @@ def read_fvecs(path):
     file.close()
     return vectors
 
+
 def read_ivecs(path):
 
-    
     fileSize = os.path.getsize(path)
     file =  open(path,'rb')
     #first 4 bytes of every vector indicate number od dimensions 
@@ -62,9 +61,6 @@ def read_ivecs(path):
     file.close()
     return vectors
 
-
-def calculateRecall(tOfTrueNeighbours):
-    recall = sum(numOfTrueNeighbours) /result.size
 
 #compares result set with true neighborst test set
 #returns intesection of two lists
@@ -86,18 +82,6 @@ def returnRecAll(result, test):
         recall = sum(numOfTrueNeighbours) /result.size
     return recall
 
-def returnNumerOfTrueNeighboursPerQuery(result, test):
-    listOfTrueNeighbors = returnTrueNeighbours(result,test)
-    numOfTrueNeighbours = []
-    for i in range(len(listOfTrueNeighbors)):
-        numTN = len(listOfTrueNeighbors[i])
-        numOfTrueNeighbours.append(numTN)
-    return numOfTrueNeighbours
 
-def calculateRacl(result, test):
-    trueNNperQuery = returnNumerOfTrueNeighboursPerQuery(result, test)
-    recall = sum(trueNNperQuery) /len(trueNNperQuery)
-    return recall
-    
 
 

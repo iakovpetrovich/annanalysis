@@ -102,8 +102,11 @@ for q in query:
 end_time = process_time()
 end_time - startTime
 
+
+
 result = np.asanyarray(result)
 annoyRecall = returnRecAll(result, groundTruth)    
+
 
 def returnTrueNeighbours(result, test):
     TrueNeighbours = []
@@ -115,13 +118,62 @@ def returnTrueNeighbours(result, test):
 tn = returnTrueNeighbours(result, groundTruth)
 len(tn[43])
 
-#SomeOtherApproach
+"""
+NMSLIP 
+They have implemented a few algs
+Emphasizing HNSW as most successful 
+Modifications of VP and NAPP are introduced
+hnsw, sw-graph, vp-tree, napp, simple_invindx,brute_force 
+"""
+
+#HNSW
+import nmslib
+
+hnsw = nmslib.init(method='hnsw', space='l2')
+hnsw.addDataPointBatch(train)
+
+startTime = process_time()
+hnsw.createIndex({'post': 2}, print_progress=True)
+end_time = process_time()
+end_time - startTime
+
+# query for the nearest neighbours of the first datapoint
+ids, distances = index.knnQuery(data[0], k=10 )
+
+# get all nearest neighbours for all the datapoint
+# using a pool of 4 threads to compute
+startTime = process_time()
+neighbours = hnsw.knnQueryBatch(query, k=100, num_threads=2)
+end_time = process_time()
+end_time - startTime
 
 
+rez =[]
+for i in neighbours:
+    print(list(i[0]))
+    rez.append(list(i))
+result = np.asanyarray(rez)
+len(neighbours[0][1])
+len(neighbours)
+returnRecAll(result, groundTruth)
 
 
+result = []
+startTime = process_time()
+for q in query:
+    result.append((hnsw.knnQuery(q, k=100))[0])
+end_time = process_time()
+end_time - startTime
 
 
+rez = []
+for i in result:
+    rez.append(list(i))
+
+result = np.asanyarray(rez)
+
+
+returnRecAll(result, groundTruth)
 
 
 
