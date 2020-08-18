@@ -33,7 +33,7 @@ def returnRecAll(result, test):
     numOfTrueNeighbours = []
     #for every result vector we check how many right neighbours were identified
     for i in range(result.shape[0]):
-        numTN = len(set(result[i].tolist()) & set(groundTruth[i].tolist()))
+        numTN = len(set(result[i].tolist()) & set(test[i].tolist()))
         numOfTrueNeighbours.append(numTN)
         recall = sum(numOfTrueNeighbours) /result.size
     return recall
@@ -104,6 +104,16 @@ end_time - startTime
 
 result = np.asanyarray(result)
 annoyRecall = returnRecAll(result, groundTruth)    
+
+def returnTrueNeighbours(result, test):
+    TrueNeighbours = []
+    for i in range(result.shape[0]):
+        TN = list(set(result[i].tolist()) & set(test[i].tolist()))
+        TrueNeighbours.append(TN)
+    return TrueNeighbours
+
+tn = returnTrueNeighbours(result, groundTruth)
+len(tn[43])
 
 #SomeOtherApproach
 

@@ -63,24 +63,28 @@ def read_ivecs(path):
     return vectors
 
 
-path = 'C:/Users/jasap/Downloads/siftsmall.tar/siftsmall/siftsmall_base.fvecs'
-v = read_fvecs(path)
-test = fvecs_read(path)
-
-v[11][3]
-test[11][3]
-
-
-
-def calculateRacl(tOfTrueNeighbours):
+def calculateRecall(tOfTrueNeighbours):
     recall = sum(numOfTrueNeighbours) /result.size
 
+#compares result set with true neighborst test set
+#returns intesection of two lists
 def returnTrueNeighbours(result, test):
     TrueNeighbours = []
+     #for every result vector we check how many right neighbours were identified
     for i in range(result.shape[0]):
-        TN = list(set(result[i].tolist()) & set(groundTruth[i].tolist()))
+        TN = list(set(result[i].tolist()) & set(test[i].tolist()))
         TrueNeighbours.append(TN)
     return TrueNeighbours
+
+#returns ratio of found trueneighbors / totalnumberofneighbours
+def returnRecAll(result, test):
+    numOfTrueNeighbours = []
+    #for every result vector we check how many right neighbours were identified
+    for i in range(result.shape[0]):
+        numTN = len(set(result[i].tolist()) & set(test[i].tolist()))
+        numOfTrueNeighbours.append(numTN)
+        recall = sum(numOfTrueNeighbours) /result.size
+    return recall
 
 def returnNumerOfTrueNeighboursPerQuery(result, test):
     listOfTrueNeighbors = returnTrueNeighbours(result,test)
