@@ -16,7 +16,6 @@ import numpy as np
 sys.path.append("C:/Users/jasap/.spyder-py3/annanalysis/")
 import helper as hp
 import time
-
 from time import process_time 
 
 trainPath = 'C:/Users/jasap/Downloads/siftsmall.tar/siftsmall/siftsmall_base.fvecs'
@@ -59,8 +58,66 @@ startTime = process_time()
 result = kdt.query(query, k=100, return_distance=False)
 end_time = process_time()
 end_time - startTime
-kdTreeRecall = returnRecAll(result, groundTruth)
+kdTreeRecall = hp.returnRecAll(result, groundTruth)
 
+#Testing K-D tree capabilities in different dimensions
+#Trying to produce "CURSE of dimensionality" but it is only linear growth
+results = pd.DataFrame({'Dimensions':[0], 'constructionTime':[0.0], 'searchTime':[0.0]})
+
+dimensionsList=[]
+cinstruciotnTimes=[]
+searchTimes=[]
+for dimensions in range(5,126,5):
+    
+    for i in range(0,5):
+        
+        testRandomMatrix = []
+        for i in range(10000):
+            vector = [random.gauss(0, 1) for z in range(dimensions)]
+            testRandomMatrix.append(vector)
+            
+        testQuery = random.sample(testRandomMatrix, 100)
+       
+            
+        startTime = process_time()       
+        kdt = KDTree(np.array(testRandomMatrix), leaf_size=30, metric='euclidean')
+        end_time = process_time()
+        constructionTime = end_time - startTime
+            
+        startTime = process_time()
+        result = kdt.query( np.array(testQuery), k=100, return_distance=False)
+        end_time = process_time()
+        searchTime = end_time - startTime
+        
+        dimensionsList.append(dimensions)
+        cinstruciotnTimes.append(constructionTime)
+        searchTimes.append(searchTime)
+
+ results3= pd.DataFrame({'Dimensions':dimensionsList, 'constructionTime':cinstruciotnTimes, 'searchTime':searchTimes})  
+results = pd.DataFrame({'Dimensions':dimensionsList, 'constructionTime':cinstruciotnTimes, 'searchTime':searchTimes})
+results2 = pd.DataFrame({'Dimensions':dimensionsList, 'constructionTime':cinstruciotnTimes, 'searchTime':searchTimes}) 
+ 
+   
+rezultati = results.deep_copy()
+
+totalResults = results.append(results2)
+
+totalResults.groupby(["Dimensions"]).agg({
+        
+        'Dimensions':'mean',
+        'constructionTime':'mean',
+        'searchTime':'mean'
+        
+        })
+
+
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+
+ax = sns.lineplot(x="Dimensions", y="searchTime",  dashes=True, data=totalResults)
+
+totalResults.to_csv('C:/Users/jasap/.spyder-py3/annanalysis/TryingToProduceCurseOfDimensionality.csv')
 
 #BallTree
 from sklearn.neighbors import BallTree
