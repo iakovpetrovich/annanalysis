@@ -28,7 +28,7 @@ query = hp.read_fvecs(queryPath)
 #there is index number of 100 nearset n. for each querry point
 groundTruth = hp.read_ivecs(groundPath)
 
-def returnRecAll(result, test):
+def returnRecall(result, test):
     numOfTrueNeighbours = []
     #for every result vector we check how many right neighbours were identified
     for i in range(result.shape[0]):
@@ -72,7 +72,7 @@ for dimensions in range(5,126,5):
     for i in range(0,5):
         
         testRandomMatrix = []
-        for i in range(10000):
+        for i in range(100000):
             vector = [random.gauss(0, 1) for z in range(dimensions)]
             testRandomMatrix.append(vector)
             
@@ -80,7 +80,7 @@ for dimensions in range(5,126,5):
        
             
         startTime = process_time()       
-        kdt = KDTree(np.array(testRandomMatrix), leaf_size=30, metric='euclidean')
+        kdt = KDTree(np.array(testRandomMatrix), leaf_size=5, metric='euclidean')
         end_time = process_time()
         constructionTime = end_time - startTime
             
@@ -102,6 +102,7 @@ rezultati = results.deep_copy()
 
 totalResults = results.append(results2)
 
+totalResults = results3
 totalResults.groupby(["Dimensions"]).agg({
         
         'Dimensions':'mean',
@@ -118,6 +119,39 @@ import matplotlib.pyplot as plt
 ax = sns.lineplot(x="Dimensions", y="searchTime",  dashes=True, data=totalResults)
 
 totalResults.to_csv('C:/Users/jasap/.spyder-py3/annanalysis/TryingToProduceCurseOfDimensionality.csv')
+
+kdt.get_tree_stats()
+
+#provera sa Bal tree
+from sklearn.neighbors import BallTree
+bt = BallTree(np.array(testRandomMatrix), leaf_size=1000000, metric='euclidean')
+startTimeBT = process_time()
+resultBT = bt.query(np.array(testQuery), k=100, return_distance=False)
+end_timeBT = process_time()
+end_timeBT- startTimeBT 
+hp.returnRecAll(result, resultBT)
+
+
+      
+startTimeKDT = process_time()       
+kdt = KDTree(np.array(testRandomMatrix), leaf_size=10, metric='euclidean')
+end_timeKDT = process_time()
+constructionTimeKDT = end_timeKDT - startTimeKDT
+            
+startTimeKDT = process_time()
+resultKDT = kdt.query( np.array(testQuery), k=100, return_distance=False)
+end_timeKDT = process_time()
+searchTimeKDT = end_timeKDT - startTimeKDT
+
+
+from sklearn.neighbors import NearestNeighbors
+nbrs = NearestNeighbors(n_neighbors=100, algorithm='brute').fit(np.array(testRandomMatrix))
+
+startTimeBr = process_time() 
+resultBr = nbrs.kneighbors( np.array(testQuery),return_distance=False)
+end_timeBr = process_time()
+end_timeBr - startTimeBr
+bruteRecall = hp.returnRecAll(resultBr, resultBT)
 
 #BallTree
 from sklearn.neighbors import BallTree

@@ -73,7 +73,7 @@ def returnTrueNeighbours(result, test):
     return TrueNeighbours
 
 #returns ratio of found trueneighbors / totalnumberofneighbours
-def returnRecAll(result, test):
+def returnRecall(result, test):
     numOfTrueNeighbours = []
     #for every result vector we check how many right neighbours were identified
     for i in range(result.shape[0]):
@@ -81,6 +81,24 @@ def returnRecAll(result, test):
         numOfTrueNeighbours.append(numTN)
         recall = sum(numOfTrueNeighbours) /result.size
     return recall
+
+def saveDataframe(dataFrame, path, filename):
+    dataFrame.to_csv(path + filename + '.csv' , sep='\t' )
+    
+def createTestAndQuery(dimensions, trainPoints, queryPoints):
+    import random
+    testRandomMatrix = []
+        
+    for i in range(trainPoints):
+            vector = [random.gauss(0, 1) for z in range(dimensions)]
+            testRandomMatrix.append(vector)
+            
+    testQuery = random.sample(testRandomMatrix, 100)
+    
+    return testRandomMatrix, testQuery
+
+
+
 
 
 
