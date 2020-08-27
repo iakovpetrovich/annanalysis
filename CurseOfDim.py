@@ -94,6 +94,12 @@ for dimensions in range(2,33,2):
         cinstruciotnTimes.append(constructionTime)
         searchTimes.append(searchTime)
         algorithm.append('brute_force')
+        
+        ##RealBruteForce
+        #
+        for q in testQuery:
+            for d in testRandomMatrix:
+                
 
 
 
@@ -129,3 +135,41 @@ plt.savefig('C:/Users/jasap/.spyder-py3/annanalysis/graphs/KDBruteFCurseOfDim.pn
 grouppedResults.to_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/KDBruteFCurseOfDim.csv', sep='\t' )
 
 
+x = [6,3,8,4,5,10,9,2]
+y = [2,5,4,3,7,1,6,7]
+import matplotlib.pyplot as plt
+import numpy as np
+plt.style.use('seaborn-whitegrid')
+plt.scatter(x,y)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.xlim([0,11])
+plt.ylim([0,11])
+plt.xticks(np.arange(0,12,1))
+plt.yticks(np.arange(0,12,1))
+for i in range(len(x)):
+    #print('('+str(x[i])+','+str(y[i])+')')
+    plt.annotate('('+str(x[i])+','+str(y[i])+')',(x[i],y[i]))
+
+plt.show()
+
+from graphviz import Digraph
+import os
+os.environ["PATH"] += os.pathsep + 'C:/Users/jasap/Anaconda3/Library/bin/graphviz'
+dot = Digraph(format='png')
+dot.node('a', '(6,2)')
+dot.node('b', '(3,5)')
+dot.node('c', '(8,4)')
+dot.node('d', '(4,3)')
+dot.node('e', '(5,7)')
+dot.node('f', '(10,1)')
+dot.node('g', '(9,6)')
+dot.edges(['ab','ac','bd','be','cf','cg'])
+
+
+dot.render('test-output/kdTree.gv', view=True)
+
+@Profile
+def f():
+    a,b = createTestAndQuery(dimensions,100000, 100)
+    

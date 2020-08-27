@@ -98,7 +98,11 @@ def createTestAndQuery(dimensions, trainPoints, queryPoints):
     return testRandomMatrix, testQuery
 
 
-
+def fillIfNotAllAreFound(result):
+    for i in range(len(result)):
+        if len(result[i]) < 100: 
+            result[i].extend((100-len(result[i])) *[-1]) 
+    return result
 
 
 

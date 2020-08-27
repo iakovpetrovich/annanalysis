@@ -41,73 +41,6 @@ reacll = []
 k = 100
 avgdistances = []
 
-#bruteForce
-from sklearn.neighbors import NearestNeighbors
-
-startTime = process_time() 
-nbrs = NearestNeighbors(n_neighbors=100, algorithm='brute').fit(train)
-end_time = process_time()
-constructionTime = end_time - startTime
-
-startTime = process_time() 
-dist,result = nbrs.kneighbors(query,return_distance=True)
-end_time = process_time()
-searchTime = end_time - startTime
-
-bruteRecall = hp.returnRecall(result, groundTruth)
-avgDist = np.mean(np.mean(dist,axis=1))
-
-reacll.append(bruteRecall)
-algorithm.append('brute force')
-construciotnTimes.append(constructionTime)
-searchTimes.append(searchTime)
-avgdistances.append(avgDist)
-
-#KDTree test scikit learn
-from sklearn.neighbors import KDTree
-
-startTime = process_time()
-kdt = KDTree(train, metric='euclidean')
-end_time = process_time()
-constructionTime = end_time - startTime
-
-startTime = process_time()
-dist, result = kdt.query(query, k=100, return_distance=True)
-end_time = process_time()
-searchTime = end_time - startTime
-
-kdTreeRecall = hp.returnRecall(result, groundTruth)
-avgDist = np.mean(dist)
-
-reacll.append(kdTreeRecall)
-algorithm.append('k-D')
-construciotnTimes.append(constructionTime)
-searchTimes.append(searchTime)
-avgdistances.append(avgDist)
-
-
-#BallTree
-from sklearn.neighbors import BallTree
-
-startTime = process_time()
-bt = BallTree(train, metric='euclidean')
-end_time = process_time()
-constructionTime = end_time - startTime
-
-startTime = process_time()
-dist, result = bt.query(query, k=100, return_distance=True)
-end_time = process_time()
-searchTime = end_time - startTime
-
-ballTreeRecall = hp.returnRecall(result, groundTruth)
-avgDist = np.mean(dist)
-
-reacll.append(ballTreeRecall)
-algorithm.append('ball-tree')
-construciotnTimes.append(constructionTime)
-searchTimes.append(searchTime)
-avgdistances.append(avgDist)
-
 #Annoy
 from annoy import AnnoyIndex
 f = train.shape[1]
@@ -116,7 +49,7 @@ t = AnnoyIndex(f, 'euclidean')
 startTime = process_time()
 for i in range(train.shape[0]):
     t.add_item(i,train[i])
-t.build(15)
+t.build(30)
 end_time = process_time()
 constructionTime = end_time - startTime
 
@@ -273,7 +206,7 @@ flann = FLANN()
 set_distance_type('euclidean')
 
 startTime = process_time()
-flann.build_index(train, algorithm='kdtree', trees=10)
+flann.build_index(train, algorithm='kdtree', trees=30)
 end_time = process_time()
 constructionTime = end_time - startTime
 
