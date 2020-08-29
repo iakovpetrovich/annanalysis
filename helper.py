@@ -79,7 +79,7 @@ def returnRecall(result, test):
     for i in range(result.shape[0]):
         numTN = len(set(result[i].tolist()) & set(test[i].tolist()))
         numOfTrueNeighbours.append(numTN)
-        recall = sum(numOfTrueNeighbours) /result.size
+        recall = sum(numOfTrueNeighbours) /test.size
     return recall
 
 def saveDataframe(dataFrame, path, filename):

@@ -67,7 +67,7 @@ avgdistances.append(avgDist)
 from sklearn.neighbors import KDTree
 
 startTime = process_time()
-kdt = KDTree(train, metric='euclidean')
+kdt = KDTree(train, metric='euclidean', leaf_size = 2)
 end_time = process_time()
 constructionTime = end_time - startTime
 
@@ -78,7 +78,7 @@ searchTime = end_time - startTime
 
 kdTreeRecall = hp.returnRecall(result, groundTruth)
 avgDist = np.mean(dist)
-
+ktreeparams = kdt.get_tree_stats()
 reacll.append(kdTreeRecall)
 algorithm.append('k-D')
 construciotnTimes.append(constructionTime)
@@ -101,7 +101,7 @@ searchTime = end_time - startTime
 
 ballTreeRecall = hp.returnRecall(result, groundTruth)
 avgDist = np.mean(dist)
-
+ballTreeparams = bt.get_tree_stats()
 reacll.append(ballTreeRecall)
 algorithm.append('ball-tree')
 construciotnTimes.append(constructionTime)
@@ -167,7 +167,7 @@ for q in mrtpquery:
     dist.append(d)
 end_time = process_time()
 searchTime = end_time - startTime
-    
+mrptparams = index.parameters()    
 result = hp.fillIfNotAllAreFound(rez)   
 
 result = np.asanyarray(result)
@@ -196,7 +196,8 @@ hnsw = nmslib.init(method='hnsw', space='l2')
 
 startTime = process_time()
 hnsw.addDataPointBatch(train)
-hnsw.createIndex({'delaunay_type':1})
+#hnsw.createIndex({'delaunay_type':1})
+hnsw.createIndex({'delaunay_type':2, 'M':20})
 end_time = process_time()
 constructionTime = end_time - startTime
 
@@ -273,7 +274,8 @@ flann = FLANN()
 set_distance_type('euclidean')
 
 startTime = process_time()
-flann.build_index(train, algorithm='kdtree', trees=10)
+flannparams =  flann.build_index(train, algorithm ='autotuned', target_precision=0.8, build_weight=0.02,memory_weight=0.01,sample_fraction=0.01)
+#flann.build_index(train, algorithm='kdtree', trees=15)
 end_time = process_time()
 constructionTime = end_time - startTime
 
@@ -291,7 +293,64 @@ rkdDflannRecall = hp.returnRecall(result, groundTruth)
 avgDist = np.mean(np.sqrt(dist))
 
 reacll.append(rkdDflannRecall)
-algorithm.append('rkd-tree-flann')
+algorithm.append(flannparams['algorithm']+'-flann')
+construciotnTimes.append(constructionTime)
+searchTimes.append(searchTime)
+avgdistances.append(avgDist)
+
+flann = FLANN()
+set_distance_type('euclidean')
+
+startTime = process_time()
+flannparamsKmeans =  flann.build_index(train, algorithm='kmeans', branching=2, centersinit = 'gonzales')
+
+end_time = process_time()
+constructionTime = end_time - startTime
+
+startTime = process_time()
+result, dist = flann.nn_index(query, 100)
+end_time = process_time()
+searchTime = end_time - startTime
+
+result = hp.fillIfNotAllAreFound(result)    
+
+result = np.asanyarray(result)
+
+
+rkdDflannRecall = hp.returnRecall(result, groundTruth)
+avgDist = np.mean(np.sqrt(dist))
+
+reacll.append(rkdDflannRecall)
+algorithm.append(flannparamsKmeans['algorithm']+'-flann')
+construciotnTimes.append(constructionTime)
+searchTimes.append(searchTime)
+avgdistances.append(avgDist)
+
+
+flann = FLANN()
+set_distance_type('euclidean')
+
+startTime = process_time()
+flannparamsKdtree =  flann.build_index(train, algorithm='kdtree', trees=15)
+
+end_time = process_time()
+constructionTime = end_time - startTime
+
+startTime = process_time()
+result, dist = flann.nn_index(query, 100)
+end_time = process_time()
+searchTime = end_time - startTime
+
+result = hp.fillIfNotAllAreFound(result)    
+
+result = np.asanyarray(result)
+
+
+rkdDflannRecall = hp.returnRecall(result, groundTruth)
+avgDist = np.mean(np.sqrt(dist))
+
+reacll.append(rkdDflannRecall)
+algorithm.append(flannparamsKdtree['algorithm']+'-flann')
 construciotnTimes.append(constructionTime)
 searchTimes.append(searchTime)
 avgdistances.append(avgDist)
@@ -300,4 +359,4 @@ avgdistances.append(avgDist)
 
 compareResults = pd.DataFrame({ 'algorithm':algorithm, 'constructionTime':construciotnTimes, 'searchTime':searchTimes,'recall':reacll,'avgDistance':avgdistances})
 
-compareResults.to_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/siftSmallNoParams.csv', sep='\t' )
+compareResults.to_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/siftSmall.csv', sep='\t' )
