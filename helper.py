@@ -105,5 +105,67 @@ def fillIfNotAllAreFound(result):
     return result
 
 
+def get_zippedFvecs(pathToGz,memeber):
+    import tarfile
+    fn = pathToGz
+    import struct
+    import numpy as np
+    t = tarfile.open(fn, 'r:gz') 
+    
+    
+    m = t.getmember(memeber)
+    file = t.extractfile(m)
+    fileSize = m.size
+    #file =  open(path,'rb')
+    #first 4 bytes of every vector indicate number od dimensions 
+    numOfDimensions = struct.unpack('i', file.read(4))[0]
+    #each vector has 4 bytes (float is 32 bits) * numberOfDimensions
+    #plus 4 bytes long indicator as mentioned  
+    numOfVectors = (int) (fileSize / (4 + 4*numOfDimensions))
+    #init empty list for vectors
+    #vectors = []
+    vectors = np.zeros((numOfVectors,numOfDimensions))
+    #return to the beginning
+    file.seek(0)
+    for vecotr in range(numOfVectors):
+        file.read(4) #go trough indicator of dimensions
+        #vectors.append(struct.unpack('f' * numOfDimensions, file.read(4*numOfDimensions)))
+        vectors[vecotr] = struct.unpack('f' * numOfDimensions, file.read(4*numOfDimensions))
+    file.close()
+    return vectors
+    
+p =  'C:/Users/jasap/Downloads/siftsmall.tar.gz'
+f = 'siftsmall/siftsmall_base.fvecs'  
+v = get_zippedFvecs(p,f)
 
+
+
+def get_zippedIvecs(pathToGz,memeber):
+    import tarfile
+    fn = pathToGz
+    import struct
+    import numpy as np
+    t = tarfile.open(fn, 'r:gz') 
+    
+    
+    m = t.getmember(memeber)
+    file = t.extractfile(m)
+    fileSize = m.size
+    #file =  open(path,'rb')
+    #first 4 bytes of every vector indicate number od dimensions 
+    numOfDimensions = struct.unpack('i', file.read(4))[0]
+    #each vector has 4 bytes (float is 32 bits) * numberOfDimensions
+    #plus 4 bytes long indicator as mentioned  
+    numOfVectors = (int) (fileSize / (4 + 4*numOfDimensions))
+    #init empty list for vectors
+    #vectors = []
+    vectors = np.zeros((numOfVectors,numOfDimensions))
+    #return to the beginning
+    file.seek(0)
+    for vecotr in range(numOfVectors):
+        file.read(4) #go trough indicator of dimensions
+        #vectors.append(struct.unpack('f' * numOfDimensions, file.read(4*numOfDimensions)))
+        vectors[vecotr] = struct.unpack('i' * numOfDimensions, file.read(4*numOfDimensions))
+    file.close()
+    return vectors
 

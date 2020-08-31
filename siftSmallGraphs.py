@@ -115,7 +115,8 @@ plt.show()
 
 
 
-dfs = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/sift1mBetterResults.csv', sep='\t')
+dfs = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/sift1MilionToJeTo.csv', sep='\t')
+#dfs.drop(axis=0,labels=19,inplace=True)
 
 Annoy = dfs[dfs['algorithm'].str.contains('Annoy')][['recall','searchTime']]
 hnsw = dfs[dfs['algorithm'].str.contains('HNSW')][['recall','searchTime']]
@@ -136,7 +137,131 @@ plt.plot(list(vp.recall),list(vp.searchTime),
 #plt.xticks(visual['Dimensions'].unique())
 plt.xlabel('R')
 plt.ylabel('Ts')
-
+plt.ylim([0,250])
 plt.legend()
 plt.show()
+
+
+
+
+#_________DATABRICKS__________#
+
+dfs = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/Sift1MDataBricks.csv')
+
+Annoy = dfs[dfs['algorithm'].str.contains('Annoy')]
+hnsw = dfs[dfs['algorithm'].str.contains('HNSW')]
+vp = dfs[dfs['algorithm'].str.contains('vp-')]
+linear = dfs[dfs['algorithm'].str.contains('linear')]
+kd = dfs[dfs['algorithm'].str.contains('k-D')]
+flann = dfs[dfs['algorithm'].str.contains('flann')]
+lsh = dfs[dfs['algorithm'].str.contains('lsh')]
+
+
+import matplotlib.pyplot as plt
+
+plt.style.use('seaborn-whitegrid')
+plt.plot(list(Annoy.recall),list(Annoy.searchTime), 
+         label = 'Annoy', color = 'tab:blue', marker = 'd' )
+plt.plot(list(hnsw.recall),list(hnsw.searchTime),
+         label = 'HNSW', color = 'tab:orange', marker = 'o' )
+plt.plot(list(vp.recall),list(vp.searchTime), 
+         label = 'vp-Tree', color = 'tab:purple', marker = 's' )
+plt.plot(list(linear.recall),list(linear.searchTime), 
+         label = 'linear', color = 'black', marker = '^' )
+plt.plot(list(kd.recall),list(kd.searchTime), 
+         label = 'k-D', color = 'gray', marker = 'v' )
+plt.plot(list(flann.recall),list(flann.searchTime), 
+         label = 'kmeans-flann', color = 'yellow', marker = '+' )
+plt.plot(list(lsh.recall),list(lsh.searchTime), 
+         label = 'lsh', color = 'green', marker = '*' )
+
+plt.legend()
+plt.xlabel('R')
+plt.ylabel('Ts')
+
+plt.show()
+#____________________________#
+dfs['Qsec'] = 10000/ dfs.searchTime
+
+
+
+Annoy = dfs[dfs['algorithm'].str.contains('Annoy')]
+hnsw = dfs[dfs['algorithm'].str.contains('HNSW')]
+vp = dfs[dfs['algorithm'].str.contains('vp-')]
+linear = dfs[dfs['algorithm'].str.contains('linear')]
+kd = dfs[dfs['algorithm'].str.contains('k-D')]
+flann = dfs[dfs['algorithm'].str.contains('flann')]
+lsh = dfs[dfs['algorithm'].str.contains('lsh-l11k3')]
+
+import matplotlib.pyplot as plt
+
+plt.style.use('seaborn-whitegrid')
+plt.plot(list(Annoy.recall),list(Annoy.Qsec), 
+         label = 'Annoy', color = 'tab:blue', marker = 'd' )
+plt.plot(list(hnsw.recall),list(hnsw.Qsec),
+         label = 'HNSW', color = 'tab:orange', marker = 'o' )
+plt.plot(list(vp.recall),list(vp.Qsec), 
+         label = 'vp-Tree', color = 'tab:purple', marker = 's' )
+plt.plot(list(flann.recall),list(flann.Qsec), 
+         label = 'kmeans-flann', color = 'yellow', marker = '+' )
+plt.plot(list(lsh.recall),list(lsh.Qsec), 
+         label = 'lsh', color = 'green', marker = '*' )
+#plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.legend()
+plt.xlabel('R')
+plt.ylabel('Upit/sec')
+
+plt.show()
+
+
+
+http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz
+
+
+
+#_____DATABRICKS popravljen LSH_______________
+
+dfs = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/Sift1MDataBricksPopravljenLSH.csv')
+
+Annoy = dfs[dfs['algorithm'].str.contains('Annoy')]
+hnsw = dfs[dfs['algorithm'].str.contains('HNSW')]
+vp = dfs[dfs['algorithm'].str.contains('vp-')]
+linear = dfs[dfs['algorithm'].str.contains('linear')]
+kd = dfs[dfs['algorithm'].str.contains('k-D')]
+flann = dfs[dfs['algorithm'].str.contains('flann')]
+lsh = dfs[dfs['algorithm'].str.contains('lsh')]
+
+
+import matplotlib.pyplot as plt
+
+plt.style.use('seaborn-whitegrid')
+plt.plot(list(Annoy.recall),list(Annoy.searchTime), 
+         label = 'Annoy', color = 'tab:blue', marker = 'd' )
+plt.plot(list(hnsw.recall),list(hnsw.searchTime),
+         label = 'HNSW', color = 'tab:orange', marker = 'o' )
+plt.plot(list(vp.recall),list(vp.searchTime), 
+         label = 'vp-Tree', color = 'tab:purple', marker = 's' )
+plt.plot(list(linear.recall),list(linear.searchTime), 
+         label = 'linear', color = 'black', marker = '^' )
+
+plt.plot(list(flann.recall),list(flann.searchTime), 
+         label = 'kmeans-flann', color = 'yellow', marker = '+' )
+plt.plot(list(lsh.recall),list(lsh.searchTime), 
+         label = 'lsh', color = 'green', marker = '*' )
+
+plt.legend()
+plt.xlabel('R')
+plt.ylabel('Ts')
+
+plt.show()
+
+dfs.recall = dfs.recall.round(4)
+dfs.searchTime = dfs.searchTime.round(4)
+dfs.constructionTime = dfs.constructionTime.round(2)
+dfs.avgDistance = dfs.avgDistance.round(2)
+
+dfs.to_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/excel/Sift1MDataBricksPopravljenLSH.csv', sep = '\t')
+
+
+
 
