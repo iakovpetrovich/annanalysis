@@ -209,8 +209,189 @@ plt.show()
 #
 #
 
+#____OPTIMIZED_APPROACH___________#
+
+
+for trees in [1,5,10,20,30,40,50,60,70]:
+    numTrees = trees
+    
+    f = train.shape[1]
+    t = AnnoyIndex(f, 'euclidean')
+    
+    startClock= time.clock()
+    startTime = process_time()
+    for i in range(train.shape[0]):
+        t.add_item(i,train[i])
+    t.build(numTrees)
+    end_time = process_time()
+    constructionTime = end_time - startTime
+    endClock = time.clock()
+    constructionClock= endClock - startClock
+
+    for search in [0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5]:
+        
+        
+        searchK = int(search * k * numTrees)
+    
+    
+        numTreesParam.append(numTrees)
+        searchKparam.append(searchK)
+    
+        
+    
+    
+        rez = []
+        dist = []
+        startClock = time.clock()
+        startTime = process_time()
+        for q in query:
+            res,d = t.get_nns_by_vector(q, 100, search_k = searchK, include_distances=True)
+            rez.append(res)
+            dist.append(d)
+            #result.append(t.get_nns_by_vector(q, 100, include_distances=True))
+        end_time = process_time()
+        searchTime = end_time - startTime
+        endClock = time.clock()
+        searchClock= endClock - startClock
+        
+            
+        result = hp.fillIfNotAllAreFound(rez)
+        
+        result = np.asanyarray(result)
+        annoyRecall = hp.returnRecall(result, groundTruth)  
+        avgDist = np.mean(list(chain.from_iterable(dist)))
+        
+        reacll.append(annoyRecall)
+        algorithm.append('Annoy-trees-'+str(numTrees))
+        construciotnTimes.append(constructionTime)
+        searchTimes.append(searchTime)
+        avgdistances.append(avgDist)
+        searchClocks.append(searchClock)
+        constructionClocks.append(constructionClock)
+        clockAlg.append('Annoy-trees-'+str(numTrees))
+        
+        del rez
+        del dist
+        del result
+        gc.collect()
+        
+    del t
+    gc.collect()
+
+
+ 
+l = [0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5]
+lista = []
+for i in range(9):
+    print(i)
+    lista.extend(l)
+ar = pd.DataFrame({ 'algorithm':algorithm, 
+                               'constructionTime':construciotnTimes, 
+                               'searchTime':searchTimes,
+                               'recall':reacll,
+                               'avgDistance':avgdistances,
+                               'numTreesParam':numTreesParam,
+                               'searchKparam':searchKparam,
+                               'constructionClocks':constructionClocks,
+                               'searchClocks':searchClocks,
+                               'coef':lista })
+
+    
+ar = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/AnnoyParametersSIFT.csv')
+ar['coef'] = lista
+ds = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/DataBricks/Poredjenje10i70.csv')
 
 
 
+a1 = ar[(ar.numTreesParam == 1) & (ar.coef > 0.7) & (ar.coef < 1.3) ]
+a5 = ar[(ar.numTreesParam == 5) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+a10 = ar[(ar.numTreesParam == 10) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+a20 = ar[(ar.numTreesParam == 20) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+a30 = ar[(ar.numTreesParam == 30) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+a40 = ar[(ar.numTreesParam == 40) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+a50 = ar[(ar.numTreesParam == 50) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+a60 = ar[(ar.numTreesParam == 60) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+a70 = ar[(ar.numTreesParam == 70) & (ar.coef > 0.7) & (ar.coef < 1.3)]
+
+
+from itertools import cycle
+colors = ['blue','purple', 'green','yellow','orange', 'red']
+colors = ['gold','tab:red','tab:green','tab:blue', 'tab:orange',]
+markers = ['d','o','+','*','^','x']
+sets = [a1,a5,a10,a20,a30 ,a40 ,a50, a60, a70]
+
+colorC = cycle(colors)
+amrkersC = cycle(markers)
+
+#_____________searchK 
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
+plt.xlabel('searck_k')
+plt.ylabel('R')
+for s in sets:
+    plt.plot(list(s.searchKparam),list(s.recall), 
+         label = 'Annoy '+str(s.numTreesParam.iloc[0]), color = next(colorC), marker = next(amrkersC))
+    
+plt.legend()
+
+plt.show()
+ #__________R and TS
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
+plt.xlabel('Ts')
+plt.ylabel('R')
+for s in sets:
+    plt.plot(list(s.searchTime),list(s.recall), 
+         label = 'Annoy '+str(s.numTreesParam.iloc[0]), color = next(colorC), marker = next(amrkersC))
+    
+plt.legend()
+plt.show()
+
+#____________
+a10T = ds[(ds.numTreesParam == 15)]
+a70T = ds[(ds.numTreesParam == 70)]
+
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
+plt.xlabel('Ts')
+plt.ylabel('R')
+plt.plot(list(a10T.recall),list(a10T.searchTime), 
+         label = 'Annoy 15', color = 'tab:red', marker = 'd' )
+plt.plot(list(a70T.recall),list(a70T.searchTime),
+         label = 'Annoy 70', color = 'tab:blue', marker = '+' )
+    
+plt.legend()
+plt.show()
+___________________________#_________________________
+a50T = ar[(ar.numTreesParam == 50)]
+a70T = ar[(ar.numTreesParam == 70)]
+
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
+plt.xlabel('searck_k')
+plt.ylabel('R')
+plt.plot(list(a50T.searchKparam),list(a50T.searchTime), 
+         label = 'Annoy 50', color = 'tab:red', marker = 'd' )
+plt.plot(list(a70T.searchKparam),list(a70T.searchTime),
+         label = 'Annoy 70', color = 'tab:blue', marker = '+' )
+    
+plt.legend()
+plt.show()
+
+
+#_________KreiranjeI I PRINOS i distanca_____________#
+
+
+a1 = ar[(ar.numTreesParam == 1) & (ar.coef == 1) ]
+a5 = ar[(ar.numTreesParam == 5) & (ar.coef == 1)]
+a10 = ar[(ar.numTreesParam == 10) & (ar.coef == 1)]
+a20 = ar[(ar.numTreesParam == 20) & (ar.coef == 1)]
+a30 = ar[(ar.numTreesParam == 30) & (ar.coef == 1)]
+a40 = ar[(ar.numTreesParam == 40) & (ar.coef == 1)]
+a50 = ar[(ar.numTreesParam == 50) & (ar.coef == 1)]
+a60 = ar[(ar.numTreesParam == 60) & (ar.coef == 1)]
+a70 = ar[(ar.numTreesParam == 70) & (ar.coef == 1)]
+
+ar.
 
 
