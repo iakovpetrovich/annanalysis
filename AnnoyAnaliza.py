@@ -300,7 +300,7 @@ ar = pd.DataFrame({ 'algorithm':algorithm,
 ar = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/AnnoyParametersSIFT.csv')
 ar['coef'] = lista
 ds = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/DataBricks/Poredjenje10i70.csv')
-
+ds = pd.read_csv('C:/Users/jasap/.spyder-py3/annanalysis/resultCsv/DataBricks/AnnoyRaslojavanjeBolje.csv')
 
 
 a1 = ar[(ar.numTreesParam == 1) & (ar.coef > 0.7) & (ar.coef < 1.3) ]
@@ -378,8 +378,76 @@ plt.plot(list(a70T.searchKparam),list(a70T.searchTime),
 plt.legend()
 plt.show()
 
+#_____________________________________#
+a5T = ds[(ds.numTreesParam == 5)]
+a10T = ds[(ds.numTreesParam == 10)]
+a20T = ds[(ds.numTreesParam == 20)]
+a40T = ds[(ds.numTreesParam == 40)]
+
+
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
+plt.xlabel('R')
+plt.ylabel('Ts')
+plt.plot(list(a5T.recall),list(a5T.searchTime), 
+         label = 'Annoy 5', color = 'tab:red', marker = 'd' )
+plt.plot(list(a10T.recall),list(a10T.searchTime), 
+         label = 'Annoy 10', color = 'tab:green', marker = '+' )
+plt.plot(list(a20T.recall),list(a20T.searchTime), 
+         label = 'Annoy 20', color = 'tab:blue', marker = '*' )
+plt.plot(list(a40T.recall),list(a40T.searchTime),
+         label = 'Annoy 40', color = 'gold', marker = 'x' )
+plt.xticks([0.0,
+ 0.1,
+ 0.2,
+ 0.3,
+ 0.4,
+ 0.5,
+ 0.6,
+ 0.7,
+ 0.8,
+ 0.9,
+ 1.0])  
+plt.legend()
+plt.show()
+
+#DeltaR u Ts
+
+
+a5T.deltaRecall = a5T['recall'].diff()
+a10T.deltaRecall = a10T['recall'].diff()
+a20T.deltaRecall = a20T['recall'].diff()
+a40T.deltaRecall = a40T['recall'].diff()
 
 #_________KreiranjeI I PRINOS i distanca_____________#
+
+a5T.deltaRecall = a5T['recall'].diff()
+a10T.deltaRecall = a10T['recall'].diff()
+a20T.deltaRecall = a20T['recall'].diff()
+a40T.deltaRecall = a40T['recall'].diff()
+
+a5T.deltaTime = a5T['searchTime'].diff()
+a10T.deltaTime = a10T['searchTime'].diff()
+a20T.deltaTime = a20T['searchTime'].diff()
+a40T.deltaTime = a40T['searchTime'].diff()
+sum(a40T[a40T.deltaRecall > 0].deltaRecall)
+
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
+plt.xlabel('R')
+plt.ylabel('ΔR')
+plt.plot(list(a5T.deltaTime),list(a5T.deltaRecall), 
+         label = 'Annoy 5', color = 'tab:red', marker = 'd' )
+plt.plot(list(a10T.deltaTime),list(a10T.deltaRecall), 
+         label = 'Annoy 10', color = 'tab:green', marker = '+' )
+plt.plot(list(a20T.deltaTime),list(a20T.deltaRecall), 
+         label = 'Annoy 20', color = 'tab:blue', marker = '*' )
+plt.plot(list(a40T.deltaTime),list(a40T.deltaRecall),
+         label = 'Annoy 40', color = 'gold', marker = 'x' )
+
+plt.legend()
+plt.show()
+
 
 
 a1 = ar[(ar.numTreesParam == 1) & (ar.coef == 1) ]
