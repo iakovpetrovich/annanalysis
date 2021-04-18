@@ -1,5 +1,5 @@
 # annanalysis
-This is a repo containing work on my thesis concerning approximate nearest neighbors search techniques (ANN, ANNS, Similarity search)
+This is a repo containing experiments concerning approximate nearest neighbors search techniques (ANN, ANNS, Similarity search)
 
 ## What's the approximate nearest neighbour search?
 
